@@ -58,6 +58,9 @@ class Game(object):
                      'romantic with former mentor': [False,True]}  # Lists of possible options for each setting
     settings_changed = False
 
+    # Control logging 
+    logging = True
+
     # CLAN
     clan = None
     cat_class = None
@@ -158,6 +161,9 @@ class Game(object):
             # Else move on to the next item on the list
             self.settings[setting_name] = self.setting_lists[setting_name][list_index + 1]
 
+    def log(self, argument):
+        """ Call this function to log something happening; currently it just prints a string"""
+        print(argument)
 
 # M O U S E
 class Mouse(object):

@@ -58,7 +58,11 @@ class Cat(object):
         self.genderalign = None
         self.calicobase = None
         self.calicocolour = None
+        just_created = False
         if ID is None:
+            # Cat having no pre-assigned ID means they are new, not loaded from file
+            just_created = True
+
             potential_ID = str(randint(10000, 9999999))
             while potential_ID in self.all_cats:
                 potential_ID = str(randint(10000, 9999999))
@@ -247,6 +251,10 @@ class Cat(object):
             
         # SAVE CAT INTO ALL_CATS DICTIONARY IN CATS-CLASS
         self.all_cats[self.ID] = self
+
+        # Log cat's creation if they are new
+        if game.logging and just_created:
+            game.log(str(self.name) + " has joined the clan!")
 
     def is_alive(self):
         return not self.dead
