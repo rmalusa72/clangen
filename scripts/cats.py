@@ -1160,7 +1160,10 @@ class Cat(object):
         self.status = new_status
         self.name.status = new_status
         
-        game.log("statuschange", description=str(self.name) + " has become a " + new_status, cats=[self], new_status=new_status, old_status=old_status)
+        if new_status in ["leader", "deputy", "medicine cat"]:
+            game.log("statuschange", description=str(self.name) + " has become a " + new_status, cats=[self, "clan"], new_status=new_status, old_status=old_status)
+        else:
+            game.log("statuschange", description=str(self.name) + " has become a " + new_status, cats=[self], new_status=new_status, old_status=old_status)
 
         if 'apprentice' in new_status:
             self.update_mentor()
@@ -1225,9 +1228,9 @@ class Cat(object):
                 self.former_mentor.append(old_mentor)
 
 
-        if(self.mentor == None):
+        if self.mentor == None and old_mentor != self.mentor:
             game.log(event_type="newmentor", apprentice=self, mentor=None, cats=[self], description= str(self.name) + " is now mentorless")
-        else: 
+        elif old_mentor != self.mentor: 
             game.log(event_type="newmentor", apprentice=self, mentor=self.mentor, cats=[self, self.mentor], description=str(self.name) + " is now apprenticed to " +str(self.mentor.name))
 
     def update_sprite(self):

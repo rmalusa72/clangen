@@ -57,7 +57,7 @@ class Game(object):
     settings_changed = False
 
     # Control logging 
-    logging = False
+    logging = True
 
     # CLAN
     clan = None
@@ -185,13 +185,13 @@ class Game(object):
                 "other_clan": the other clan involved (object, not name string)
             9. war_notice
                 "other_clan": the other clan involved (object, not name string)
+            10. leader_death
 
         All events also have "description" which is a string description & "cats" which is a list of cats involved
+        inc. "clan" if it's a general clan event 
         """
         if not game.logging:
             return
-
-        # TODO dead apprentice prints mentorless infinite times
 
         if game.clan != None:
             print(args["description"] + str(args["cats"]) + "(Moon " + str(game.clan.age+1) + ")")

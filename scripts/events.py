@@ -99,13 +99,13 @@ class Events(object):
                 if int(other_clan.relations) <= 7:
                     if randint(1,5) == 1 and self.time_at_war > 2:
                         self.at_war = False
-                        game.log("warend", description='The war against ' + str(other_clan.name) + 'Clan has ended after ' + str(self.time_at_war) + " moons", other_clan=other_clan, war_length=self.time_at_war)
+                        game.log("warend", description='The war against ' + str(other_clan.name) + 'Clan has ended after ' + str(self.time_at_war) + " moons", other_clan=other_clan, war_length=self.time_at_war, cats=["clan"])
                         self.time_at_war = 0
                         other_clan.relations = 10
                         game.cur_events_list.append('The war against ' + str(other_clan.name) + 'Clan has ended')
                     elif self.time_at_war == 0:
                         game.cur_events_list.append('The war against ' + str(other_clan.name) + 'Clan has begun')
-                        game.log("warstart", description='The war against ' + str(other_clan.name) + 'Clan has begun', other_clan=other_clan)
+                        game.log("warstart", description='The war against ' + str(other_clan.name) + 'Clan has begun', other_clan=other_clan, cats=["clan"])
                         self.time_at_war+=1
                     else:
                         self.enemy_clan = f'{str(other_clan.name)}Clan'
@@ -116,7 +116,7 @@ class Events(object):
                         if game.clan.medicine_cat is not None:
                             possible_text.extend(['The medicine cats worry about having enough herbs to treat their clan\'s wounds'])
                         war_notice = choice(possible_text)
-                        game.log("war_notice", description=war_notice, other_clan=other_clan)
+                        game.log("war_notice", description=war_notice, other_clan=other_clan, cats=["clan"])
                         self.time_at_war+=1
                     break
                 else:
@@ -129,6 +129,7 @@ class Events(object):
     def perform_ceremonies(self, cat):
         if (game.clan.leader.dead or game.clan.leader.exiled) and game.clan.deputy is not None and not game.clan.deputy.dead:
             game.cur_events_list.append(str(game.clan.leader.name) + ' has lost their last life and has travelled to StarClan' )
+            game.log(event_type="leader_death", description=str(game.clan.leader.name) + ' has lost their last life and has travelled to StarClan', cats=[game.clan.leader, "clan"])
 
             game.clan.new_leader(game.clan.deputy)
             game.clan.leader_lives += 9
