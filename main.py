@@ -19,13 +19,14 @@ with open('saves/clanlist.txt', 'r') as read_file:
     if_clans = len(clan_list.strip())
 if if_clans > 0:
     game.switches['clan_list'] = clan_list.split('\n')
-    try:
-        cat_class.load_cats()
-        clan_class.load_clan()
-        cat_class.thoughts()
-    except Exception:
-        if not game.switches['error_message']:
-            game.switches['error_message'] = 'There was an error loading the cats file!'
+    #try:
+    cat_class.load_cats()
+    clan_class.load_clan()
+    cat_class.thoughts()
+    #except:
+    #    if not game.switches['error_message']:
+    #        game.switches['error_message'] = 'There was an error loading the cats file!'
+    #    print(Exception)
 
     try:
         game.map_info = load_map('saves/'+game.clan.name)
