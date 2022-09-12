@@ -62,6 +62,9 @@ class Clan(object):
             self.biome = biome
             self.world_seed = world_seed
             self.camp_site = camp_site
+            
+            game.log("clancreated", name=name, leader=leader, deputy=deputy,medicine_cat=medicine_cat,biome=biome,\
+                    description=str(name)+"clan has been founded!", cats=[leader, deputy, medicine_cat])
 
     def create_clan(self):
         """ This function is only called once a new clan is created in the 'clan created' screen, not every time
