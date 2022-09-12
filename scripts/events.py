@@ -30,31 +30,38 @@ class Events(object):
                 elif cat.exiled:
                     cat.moons+=1
                     if cat.moons == 6:
-                        cat.age = 'adolescent'
+                        cat.age = 'adolescent'   
                     elif cat.moons == 12:
                         cat.age = 'adult'
                     elif cat.moons == 100:
                         cat.age = 'elder'
+                    if (cat.moons in [6,12,100]):
+                        game.log("exileagechange", description=str(cat.name) + " has become a " + cat.age + " in exile", cats=[cat], age=cat.age)
+                    
                     if cat.moons > randint(100,200):
                         if choice([1, 2, 3, 4, 5]) == 1:
                             cat.dead = True
+                            game.log("exiledeath", description=str(cat.name) + " has died in exile", cats=[cat])
+                    
                     if cat.exiled and cat.status == 'leader' and randint(1, 10) == 1:
                         game.clan.leader_lives -= 1
                         if game.clan.leader_lives <= 0:
                             cat.dead = True
                             game.clan.leader_lives = 0
+                            game.log("exiledeath", description=str(cat.name) + " has died in exile", cats=[cat])
                     elif cat.exiled and cat.status == 'leader' and randint(1, 45) == 1:
                         game.clan.leader_lives -= 10
                         cat.dead = True
                         game.clan.leader_lives = 0
+                        game.log("exiledeath", description=str(cat.name) + " has died in exile", cats=[cat])
                 else:
                     cat.dead_for += 1
             # interaction here so every cat may have got a new name 
             for cat in cat_class.all_cats.copy().values(): 
                 if not cat.dead and not cat.exiled:
-                    self.create_interaction(cat)
+                    self.create_interaction(cat) # TODO log interaction
             cat_class.thoughts()
-            self.check_clan_relations()
+            self.check_clan_relations() 
             game.clan.age += 1
             if game.settings.get('autosave') is True and game.clan.age % 5 == 0:
                 cat_class.save_cats()
@@ -92,11 +99,13 @@ class Events(object):
                 if int(other_clan.relations) <= 7:
                     if randint(1,5) == 1 and self.time_at_war > 2:
                         self.at_war = False
+                        game.log("warend", description='The war against ' + str(other_clan.name) + 'Clan has ended after ' + str(self.time_at_war) + " moons", other_clan=other_clan, war_length=self.time_at_war)
                         self.time_at_war = 0
                         other_clan.relations = 10
                         game.cur_events_list.append('The war against ' + str(other_clan.name) + 'Clan has ended')
                     elif self.time_at_war == 0:
                         game.cur_events_list.append('The war against ' + str(other_clan.name) + 'Clan has begun')
+                        game.log("warstart", description='The war against ' + str(other_clan.name) + 'Clan has begun', other_clan=other_clan)
                         self.time_at_war+=1
                     else:
                         self.enemy_clan = f'{str(other_clan.name)}Clan'
@@ -107,6 +116,7 @@ class Events(object):
                         if game.clan.medicine_cat is not None:
                             possible_text.extend(['The medicine cats worry about having enough herbs to treat their clan\'s wounds'])
                         war_notice = choice(possible_text)
+                        game.log("war_notice", description=war_notice, other_clan=other_clan)
                         self.time_at_war+=1
                     break
                 else:

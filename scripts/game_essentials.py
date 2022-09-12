@@ -57,7 +57,7 @@ class Game(object):
     settings_changed = False
 
     # Control logging 
-    logging = True
+    logging = False
 
     # CLAN
     clan = None
@@ -159,9 +159,44 @@ class Game(object):
             # Else move on to the next item on the list
             self.settings[setting_name] = self.setting_lists[setting_name][list_index + 1]
 
-    def log(self, argument):
-        """ Call this function to log something happening; currently it just prints a string"""
-        print(argument)
+    def log(self, event_type, **args):
+        """ Call this function to log something happening """
+        """ event_type is a type of event, and is one of: 
+            1. clancreated (new clan)
+                "leader": cat object
+                "deputy"
+                "medicine cat"
+                "biome": Forest, mountain, etc 
+            2. newmentor (cat has changed mentor)
+                "apprentice": cat who has been reassigned
+                "mentor": new mentor, or None 
+            3. thought (cat has had a thought)
+                "thought": thought string
+            4. statuschange (cat has changed status)
+                "new_status"
+                "old_status"
+            5. exileagechange (exiled cat has changed age)
+                "age": the new age 
+            6. exiledeath (exiled cat has died)
+            7. warend
+                "other_clan": the other clan involved (object, not name string)
+                "war_length": the number of moons war continued for
+            8. warbegin
+                "other_clan": the other clan involved (object, not name string)
+            9. war_notice
+                "other_clan": the other clan involved (object, not name string)
+
+        All events also have "description" which is a string description & "cats" which is a list of cats involved
+        """
+        if not game.logging:
+            return
+
+        # TODO dead apprentice prints mentorless infinite times
+
+        if game.clan != None:
+            print(args["description"] + str(args["cats"]) + "(Moon " + str(game.clan.age+1) + ")")
+        else: 
+            print(args["description"] + str(args["cats"]) + "(Moon 0)")
 
 # M O U S E
 class Mouse(object):
