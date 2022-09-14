@@ -312,7 +312,7 @@ class Cat(object):
                     if other_cat.status == 'kitten':
                             starclan_thoughts.extend(['Rejoices with every new kit born to the Clan they still hold so dear'])
                 
-                thoughts = starclan_thoughts  # sets current thought to a random applicable thought   
+                thoughts = starclan_thoughts  # sets current thought to a random applicable thought
                 
             elif not cat.dead:
                 # general individual thoughts
@@ -1010,7 +1010,7 @@ class Cat(object):
                 elif cat.trait == 'shameless':
                     thoughts.extend(['Is grooming intensely in clear view of everyone else in camp', 'Is snoring... at a ridiculous volume',
                                      'Announced that they are heading to the dirtplace', 'Is eating, chewing very loudly',
-                                     'Was found to be faking a bellyache, earning a stern lecture from the medicine cat', 'Stumbled into mud earlier and has yet to wash',
+                                     'Was found to be faking a bellyache, earning a stern lecture', 'Stumbled into mud earlier and has yet to wash',
                                      'Was found napping in another cat\'s nest!', 'Is fishing for compliments on their recently groomed fur'])
                     # checks for specific roles
                     if other_cat.status == 'kitten':
@@ -1077,7 +1077,7 @@ class Cat(object):
             else: 
                 # if this else is reached dead is not set, just to be sure the cat should be alive
                 self.dead = False
-
+            
             thought = choice(thoughts)
             cat.thought = thought    
 
@@ -1433,20 +1433,10 @@ class Cat(object):
             # dead_for x moons
             data += ',' + str(x.dead_for)
             # apprentice
-            if x.apprentice:
+            if len(x.apprentice) > 0:
                 data += ','
                 for cat in x.apprentice:
                     data += str(cat.ID) + ';'
-                # remove last semicolon
-                data = data[:-1]
-            else:
-                data += ',' + 'None'
-            # former apprentice
-            if x.former_apprentices:
-                data += ','
-                for cat in x.former_apprentices:
-                    if cat is not None:
-                        data += str(cat.ID) + ';'
                 # remove last semicolon
                 data = data[:-1]
             else:
@@ -1465,10 +1455,26 @@ class Cat(object):
                 data+=',' + 'False'
             if x.genderalign:
                 data += ',' + str(x.genderalign)
+            else:
+                data+=',' + 'None'
             if x.calicobase:
                 data += ',' + str(x.calicobase)
+            else:
+                data+=',' + 'None'
             if x.calicocolour:
                 data += ',' + str(x.calicocolour)
+            else:
+                data+=',' + 'None'
+            # former apprentice
+            if len(x.former_apprentices) > 0:
+                data += ','
+                for cat in x.former_apprentices:
+                    if cat is not None:
+                        data += str(cat.ID) + ';'
+                # remove last semicolon
+                data = data[:-1]
+            else:
+                data += ',' + 'None'
             # next cat
             data += '\n'
 
@@ -1584,23 +1590,43 @@ class Cat(object):
                     if len(attr) > 31:
                         the_cat.dead_for = int(attr[31])
                     the_cat.skill = attr[22]
-
                     if len(attr) > 32 and attr[32] is not None:
                         the_cat.apprentice = attr[32].split(';')
-                    if len(attr) > 33 and attr[33] is not None:
-                        the_cat.former_apprentices = attr[33].split(';')
+                    if len(attr) > 33:
+                        if (attr[33] != True or attr[33] != False):
+                            the_cat.paralyzed = False
+                        else:
+                            the_cat.paralyzed = bool(attr[33])
                     if len(attr) > 34:
-                        the_cat.paralyzed = bool(attr[34])
+                        if (attr[34] != True or attr[34] != False):
+                            the_cat.no_kits = False
+                        else:
+                            the_cat.no_kits = bool(attr[34])
                     if len(attr) > 35:
-                        the_cat.no_kits = bool(attr[35])
+                        if (attr[35] != True or attr[35] != False):
+                            the_cat.exiled = False
+                        else:
+                            the_cat.exiled = bool(attr[35])
                     if len(attr) > 36:
-                        the_cat.exiled = bool(attr[36])
+                        if attr[36] != True or attr[36] != False or attr[36] != '' or attr[36] != None:
+                            the_cat.genderalign = attr[36]
+                        else:
+                            the_cat.genderalign = None
                     if len(attr) > 37:
-                        the_cat.genderalign = attr[37]
+                        if attr[37] not in ['None', 'tabby', 'tabby2', 'single', 'False', 'True']:
+                            the_cat.calicobase = 'single'
+                        else:
+                            the_cat.calicobase = attr[37]
                     if len(attr) > 38:
-                        the_cat.calicobase = attr[38]
-                    if len(attr) > 39:
-                        the_cat.calicocolour = attr[39]
+                        if attr[38] not in ['BLACK', 'BROWN', 'GREY']:
+                            the_cat.calicocolour = 'BLACK'
+                        else: 
+                            the_cat.calicocolour = attr[38]
+                    if len(attr) > 39 and attr[39] is not None:
+                        try:
+                            the_cat.former_apprentices = attr[39].split(';')
+                        except: 
+                            the_cat.former_apprentices = []
 
 
             game.switches['error_message'] = 'There was an error loading this clan\'s mentors, apprentices, relationships, or sprite info.'

@@ -133,7 +133,7 @@ class Button(object):
         if game.clicked and clickable:
             if apprentice is not None:
                 self.choose_mentor(apprentice, cat_value)
-            elif text == ' Change Name ' and game.switches['naming_text'] != '':
+            elif text == 'Change Name' and game.switches['naming_text'] != '':
                 self.change_name(game.switches['naming_text'], game.switches['name_cat'])
             elif text == ' Change Gender ' and game.switches['naming_text'] != '':
                 self.change_gender(game.switches['naming_text'], game.switches['name_cat'])
@@ -144,6 +144,9 @@ class Button(object):
             elif text == 'Allow kits':
                 cat_value.no_kits = False
             elif text == 'Exile Cat':
+                # it is the leader, manage all the things
+                if cat_class.all_cats[cat_value].status == 'leader':
+                    game.clan.leader_lives = 1
                 cat_class.all_cats[cat_value].exiled = True
                 cat_class.other_cats[cat_value] =  cat_class.all_cats[cat_value]
             elif text == 'Change to Trans Male':
