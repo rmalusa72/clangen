@@ -146,3 +146,6 @@ dmypy.json
 cython_debug/
 
 /saves/**
+
+# Cached scripts
+scripts/__pycache__/
