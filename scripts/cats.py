@@ -252,10 +252,6 @@ class Cat(object):
         # SAVE CAT INTO ALL_CATS DICTIONARY IN CATS-CLASS
         self.all_cats[self.ID] = self
 
-        # Log cat's creation if they are new
-        #if game.logging and just_created and not self.example:
-        #    game.log(event_type="newcat", cat = self, cats=[self], description=str(self.name) + ", a " + self.describe_cat() + ", has joined the clan!")
-
     def is_alive(self):
         return not self.dead
 
@@ -265,7 +261,6 @@ class Cat(object):
     def thoughts(self):
         # actions or thoughts for all cats. These switch either every moon or every time the game is re-opened
 
-        # TODO add other cat to log message
         for c in self.all_cats.keys():
             other_cat = random.choice(list(self.all_cats.keys()))
             while other_cat == c:
@@ -1087,7 +1082,10 @@ class Cat(object):
             cat.thought = thought    
 
             if not cat.example:
-                game.log(event_type="thought", cat=cat, cats=[cat], thought=thought, description=str(cat.name) + " " + thought)            
+                if str(other_cat.name) in thought:
+                    game.log(event_type="thought", cat=cat, cats=[cat, other_cat], thought=thought, description=str(cat.name) + " " + thought)            
+                else:
+                    game.log(event_type="thought", cat=cat, cats=[cat], thought=thought, description=str(cat.name) + " " + thought)            
             
             # on_patrol = ['Is having a good time out on patrol', 'Wants to return to camp to see ' + other_name,  #              'Is currently out on patrol',
             # 'Is getting rained on during their patrol',  #              'Is out hunting'] //will add later  # interact_with_loner = ['Wants to know where ' + other_name + '  #

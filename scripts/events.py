@@ -284,7 +284,12 @@ class Events(object):
                                             f'{name} is injured by ' + other_name + ' for speaking out against them', f'{name} is cruelly injured by ' + other_name + ' to make an example out of them']) 
 
         if scar_text:
-            game.cur_events_list.append(choice(scar_text))
+            scar_choice = choice(scar_text)
+            game.cur_events_list.append(scar_choice)
+            if str(other_cat.name) in scar_choice:
+                game.log("scar", description=scar_choice, cats=[cat, other_cat])
+            else:
+                game.log("scar", description=scar_choice, cats=[cat])
 
     def handle_relationships(self, cat):
         if randint(1, 100) == 1 and cat.status not in ['kitten', 'apprentice', 'medicine cat apprentice', 'medicine cat'] and cat.age in ['young adult', 'adult', 'senior adult'] and cat.mate is None:
@@ -312,6 +317,7 @@ class Events(object):
                 if count == 5:
                     return
             game.cur_events_list.append(f'{str(cat.name)} and {str(other_cat.name)} have become mates') 
+            game.log(event_type="new_mates", cats=[cat, other_cat], description=f'{str(cat.name)} and {str(other_cat.name)} have become mates')
             cat.mate = other_cat.ID
             other_cat.mate = cat.ID
 
@@ -336,15 +342,19 @@ class Events(object):
             other_cat = choice(list(cat_class.all_cats.values()))
             if cat.mate == other_cat.ID:
                 game.cur_events_list.append(f'{str(cat.name)} and {str(other_cat.name)} have broken up')
+                game.log(event_type="breakup", cats=[cat, other_cat], description=f'{str(cat.name)} and {str(other_cat.name)} have broken up')
                 cat.mate = None
                 other_cat.mate = None
         elif randint(1, 50) == 1:
             other_cat = choice(list(cat_class.all_cats.values()))
             if cat.mate == other_cat.ID and other_cat.dead == True:
                 game.cur_events_list.append(f'{str(cat.name)} will always love {str(other_cat.name)} but has decided to move on')
+                game.log(event_type="move_on", cats=[cat, other_cat], description=f'{str(cat.name)} will always love {str(other_cat.name)} but has decided to move on')
                 cat.mate = None
                 other_cat.mate = None
 
+    # TODO log loner showing up, loner dropping off kits, 
+    # warrior from other clan joining, kittypet arriving, here and in below 3 methods 
     def invite_new_cats(self, cat):
         chance = 100
         if self.living_cats < 10:
@@ -371,7 +381,12 @@ class Events(object):
                 game.clan.add_cat(kit)
                 kit_text = [f'{name} finds an abandoned kit and names them {str(kit.name)}',
                             f'A loner brings their kit named {str(kit.name.prefix)} to the clan, stating they no longer can care for them']
-                game.cur_events_list.append(choice(kit_text))
+                kit_text_choice = choice(kit_text)    
+                game.cur_events_list.append(kit_text_choice)
+                if name in kit_text_choice:
+                    game.log(event_type="loner_kit", description=kit_text_choice, cats=[cat, kit])
+                else:
+                    game.log(event_type="loner_kit", description=kit_text_choice, cats=[kit])
                 self.check_age(kit)
 
             elif type_of_new_cat == 2:
@@ -391,9 +406,15 @@ class Events(object):
                 loner.skill = 'formerly a loner'
                 game.clan.add_cat(loner)
                 loner_text = [f'{name} finds a loner who joins the clan', f'A loner says that they are interested in clan life and joins the clan']
-                game.cur_events_list.append(choice(loner_text))
+                loner_text_choice = choice(loner_text)
+                game.cur_events_list.append(loner_text_choice)
                 game.cur_events_list.append('The loner changes their name to ' + str(loner.name))
+                if name in loner_text_choice:
+                    game.log(event_type="loner_adult", description=loner_text_choice + ". " + 'The loner changes their name to ' + str(loner.name), cats=[cat, loner])
+                else: 
+                    game.log(event_type="loner_adult", description=loner_text_choice + ". " + 'The loner changes their name to ' + str(loner.name), cats=[loner])
                 self.check_age(loner)
+                
 
             elif type_of_new_cat == 4:
                 warrior = Cat(status='warrior', moons=randint(12, 150))
@@ -413,8 +434,14 @@ class Events(object):
                                          f'An injured warrior from {str(choice(game.clan.all_clans).name)}Clan asks to join in exchange for healing'])
                 else:
                     warrior_text.extend([f'{name} finds a warrior from a different clan named {str(warrior.name)} who asks to join the clan'])
-                game.cur_events_list.append(choice(warrior_text))
+                warrior_text_choice = choice(warrior_text)
+                game.cur_events_list.append(warrior_text_choice)
                 self.check_age(warrior)
+
+                if(name in warrior_text_choice):
+                    game.log(event_type="new_warrior", description=warrior_text_choice, cats=[cat, warrior])
+                else:
+                    game.log(event_type="new_warrior", description=warrior_text_choice, cats=[warrior])
 
             elif type_of_new_cat == 5:
                 self._extracted_from_invite_new_cats_47(name)
@@ -528,6 +555,7 @@ class Events(object):
         game.cur_events_list.append(str(loner_name) + ' decides to keep their name')
         self.check_age(loner)
 
+    # TODO log interactions
     def other_interactions(self, cat):
         if randint(1, 100) != 1:
             return
@@ -573,6 +601,8 @@ class Events(object):
 
         game.cur_events_list.append(choice(interactions))
 
+    # TODO log deaths
+    # as with relationships and interaction, need some way to tell if other_cat has been used 
     def handle_deaths(self, cat):
         #Leader lost a life EVENTS
         if randint(1, 100) == 1:
@@ -817,6 +847,7 @@ class Events(object):
         cat.update_mentor()
         game.clan.add_to_starclan(cat)
 
+    # TODO log kit births
     def have_kits(self, cat):
         # decide chances of having kits, and if it's possible at all
         chance = 0
@@ -1091,5 +1122,6 @@ class Events(object):
             cat1.relationships.append(Relationship(cat1,cat2))
 
         game.cur_events_list.append(f'{str(cat1.name)} and {str(cat2.name)} broke up')
+        game.log(event_type="breakup", cats=[cat1, cat2], description=f'{str(cat1.name)} and {str(cat2.name)} broke up')
 
 events_class = Events()

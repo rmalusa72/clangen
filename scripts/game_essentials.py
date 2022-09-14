@@ -186,17 +186,29 @@ class Game(object):
             9. war_notice
                 "other_clan": the other clan involved (object, not name string)
             10. leader_death
+            12. new_mates (this is for cats spontaneously becoming mates, not being assigned)
+            13. breakup 
+            14. move_on
+            14. name_change (this is for new names being set by menu-button)
+                "new_name" (string representation of new name)
+                "old_name" (string representation of old name)
+            15. gender_change (this is for new genders being set by menu-button for nonbinary cats)
+                "new_gender" (string representation of new gender)
+            16. scar 
+            17. loner_kit
+            18. loner_adult
+            19. new_warrior
 
         All events also have "description" which is a string description & "cats" which is a list of cats involved
-        inc. "clan" if it's a general clan event 
+        (as objects, not strings, so their properties are accessible); "cats" will also include the string "clan"
+        if the event is relevant to the whole clan 
         """
         if not game.logging:
             return
 
         if game.clan != None:
             print(args["description"] + str(args["cats"]) + "(Moon " + str(game.clan.age+1) + ")")
-        else: 
-            print(args["description"] + str(args["cats"]) + "(Moon 0)")
+
 
 # M O U S E
 class Mouse(object):

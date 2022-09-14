@@ -2,7 +2,7 @@ from .text import *
 from .cats import *
 from .game_essentials import *
 
-
+# TODO log status changes as result of button presses (that are not covered elsewhere)
 class Button(object):
     used_screen = screen
     used_mouse = mouse
@@ -53,6 +53,7 @@ class Button(object):
             new_pos[1] = screen_y + pos[1] - button.get_height()
         return new_pos
 
+    # TODO: log button events that are not handled by other methods
     def draw_button(self, pos, available=True, image=None, text='', cat_value=None, arrow=None, apprentice=None, hotkey=None, **values):
         dynamic_image = False
         if image is not None and text != '' and text is not None:
@@ -192,6 +193,7 @@ class Button(object):
                 else:
                     self.activate(values, arrow=arrow)
 
+    # TODO: log button events that are not handled by other methods
     def activate(self, values=None, cat_value=None, arrow=None):
         if values is None:
             values = {}
@@ -283,6 +285,7 @@ class Button(object):
             apprentice.mentor.apprentice.remove(apprentice)
             apprentice.mentor = cat_value
             cat_value.apprentice.append(apprentice)
+            game.log(event_type="newmentor", apprentice=apprentice, mentor=cat_value, cats=[apprentice, cat_value], description=str(apprentice.name) + " is now apprenticed to " +str(cat_value.name))
         game.current_screen = 'clan screen'
         cat_class.save_cats()
 
@@ -290,12 +293,15 @@ class Button(object):
         cat_value = cat_class.all_cats.get(cat_value)
         if game.switches['naming_text'] != '':
             name = game.switches['naming_text'].split(' ')
+            old_name = str(cat_value.name)
             cat_value.name.prefix = name[0]
             if len(name) > 1:
                 # If cat is an apprentice/kit and new suffix is paw/kit, leave hidden suffix unchanged 
                 if not (cat_value.name.status == "apprentice" and name[1] == "paw") and \
                     not (cat_value.name.status == "kitten" and name[1] == "kit"):
                     cat_value.name.suffix = name[1]
+            new_name = str(cat_value.name)
+            game.log(event_type="name_change", description=new_name + " has a new name (formerly " + old_name + ")", cats=[cat_value], new_name=new_name, old_name=old_name)
             cat_class.save_cats()
             game.switches['naming_text'] = ''
             
@@ -303,6 +309,7 @@ class Button(object):
         cat_value = cat_class.all_cats.get(cat_value)
         if game.switches['naming_text'] != '':
             cat_value.genderalign = game.switches['naming_text']
+            game.log(event_type="gender_change", description=str(cat_value.name)+ "'s gender is now " + cat_value.genderalign, new_gender=cat_value.genderalign, cats=[cat_value])
             cat_class.save_cats()
             game.switches['naming_text'] = ''
 
